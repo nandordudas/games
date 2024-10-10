@@ -6,9 +6,6 @@
   "description": "Games",
   "author": "Nándor Dudás <nandor.dudas@gmail.com>",
   "license": "MIT",
-  "engines": {
-    "node": ">=22.0.0"
-  },
   "scripts": {
     "build": "pnpm run --recursive build",
     "lint:fix": "pnpm lint --fix",
