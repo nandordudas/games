@@ -18,4 +18,7 @@ export default defineNuxtConfig({
       websocket: true,
     },
   },
+  hub: {
+    database: true,
+  },
 })
