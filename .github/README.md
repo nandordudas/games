@@ -2,5 +2,5 @@
 
 # Games
 
-> [!INFO]
+> [!WARNING]
 > :construction: Work in progress
