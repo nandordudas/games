@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1728594164184,
+      "tag": "0000_dashing_kree",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1728594655085,
+      "tag": "0001_fast_iron_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1728594692758,
+      "tag": "0002_productive_cassandra_nova",
+      "breakpoints": true
+    }
+  ]
+}
