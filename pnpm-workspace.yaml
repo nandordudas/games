@@ -1,0 +1,6 @@
+packages:
+  - website
+catalog:
+  vue: latest
+  vue-router: latest
+  vue-tsc: latest
