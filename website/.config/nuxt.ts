@@ -13,4 +13,9 @@ export default defineNuxtConfig({
       packageVersion: import.meta.env.npm_package_version,
     },
   },
+  nitro: {
+    experimental: {
+      websocket: true,
+    },
+  },
 })
