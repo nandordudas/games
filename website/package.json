@@ -16,5 +16,9 @@
     "vue": "catalog:",
     "vue-router": "catalog:",
     "vue-tsc": "catalog:"
+  },
+  "devDependencies": {
+    "@nuxthub/core": "^0.7.26",
+    "wrangler": "^3.80.2"
   }
 }

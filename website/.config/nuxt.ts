@@ -5,6 +5,9 @@ export default defineNuxtConfig({
   experimental: {
     typedPages: true,
   },
+  modules: [
+    '@nuxthub/core',
+  ],
   runtimeConfig: {
     public: {
       packageVersion: import.meta.env.npm_package_version,

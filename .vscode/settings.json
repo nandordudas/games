@@ -56,5 +56,8 @@
   ],
   "eslint.options": {
     "overrideConfigFile": ".config/eslint.mjs"
-  }
+  },
+  "cSpell.words": [
+    "nuxthub"
+  ]
 }
