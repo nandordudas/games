@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
+    "db:generate": "drizzle-kit generate --config .config/drizzle.ts",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "postinstall": "nuxt prepare",
@@ -12,6 +13,8 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "drizzle-kit": "^0.25.0",
+    "drizzle-orm": "^0.34.1",
     "nuxt": "^3.13.2",
     "vue": "catalog:",
     "vue-router": "catalog:",
