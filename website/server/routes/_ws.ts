@@ -10,6 +10,9 @@ const statusCodes = {
   1001: 'Going Away',
 } as const
 
+const encoder = new TextEncoder()
+const encode = encoder.encode.bind(encoder)
+
 export default defineWebSocketHandler({
   upgrade(request) {
     logger.info('upgrade request', { requestUrl: request.url })
@@ -18,7 +21,7 @@ export default defineWebSocketHandler({
   },
   open(peer) {
     logger.info('open', peer.id)
-    peer.send({ type: 'connected' })
+    peer.send(encode(JSON.stringify({ type: 'connected' })))
   },
   error(peer, error) {
     logger.error('error', { peerId: peer.id, error })
@@ -32,14 +35,14 @@ export default defineWebSocketHandler({
     logger.info('message', { peerId: peer.id, payload })
 
     try {
-      const data = JSON.parse(payload)
+      const parsedData = JSON.parse(payload)
 
-      if (data.type === 'ping') {
-        peer.send({ type: 'pong' })
+      if (parsedData.type === 'ping') {
+        peer.send(encode(JSON.stringify({ type: 'pong' })))
       }
       else {
         // echo message
-        peer.send(data)
+        peer.send(encode(JSON.stringify(parsedData)))
       }
     }
     catch (error) {
