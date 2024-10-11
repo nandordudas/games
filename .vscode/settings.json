@@ -58,6 +58,7 @@
     "overrideConfigFile": ".config/eslint.mjs"
   },
   "cSpell.words": [
+    "crossws",
     "nuxthub",
     "todos"
   ]

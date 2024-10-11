@@ -1,3 +1,6 @@
+import type { EventMap, EventPayload } from '~~/types'
+
+import type { Peer } from 'crossws'
 import { consola } from 'consola'
 import { parse } from 'cookie-es'
 
@@ -21,7 +24,7 @@ export default defineWebSocketHandler({
   },
   open(peer) {
     logger.info('open', peer.id)
-    peer.send(encode(JSON.stringify({ type: 'connected' })))
+    send<{ connected: void }>(peer, { type: 'connected' })
   },
   error(peer, error) {
     logger.error('error', { peerId: peer.id, error })
@@ -30,19 +33,18 @@ export default defineWebSocketHandler({
     logger.info('close', { peerId: peer.id, reason: statusCodes[reason.code as keyof typeof statusCodes] ?? reason })
   },
   message(peer, message) {
-    const payload = message.text()
-
-    logger.info('message', { peerId: peer.id, payload })
-
     try {
+      const payload = message.text()
       const parsedData = JSON.parse(payload)
 
+      logger.info('message', { peerId: peer.id, payload })
+
       if (parsedData.type === 'ping') {
-        peer.send(encode(JSON.stringify({ type: 'pong' })))
+        send<{ pong: void }>(peer, { type: 'pong' })
       }
       else {
         // echo message
-        peer.send(encode(JSON.stringify(parsedData)))
+        send(peer, parsedData)
       }
     }
     catch (error) {
@@ -50,3 +52,16 @@ export default defineWebSocketHandler({
     }
   },
 })
+
+function send<SendEvents extends EventMap>(
+  peer: Peer,
+  message: EventPayload<SendEvents>,
+  options?: { compress?: boolean },
+): void {
+  if (typeof message !== 'object') {
+    console.error('message must be an object')
+    return
+  }
+
+  peer.send(encode(JSON.stringify(message)), options)
+}

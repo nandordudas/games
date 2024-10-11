@@ -120,7 +120,7 @@ export function useWebSocket<T extends EventMap>(options: UseWebSocketOptions) {
     addEventListener('message', async (event: MessageEvent<Blob>) => {
       try {
         if (!(event.data instanceof Blob))
-          throw new Error('Received message is not a Blob')
+          throw new TypeError('Received message is not a Blob')
 
         const messageData = await event.data.text()
         const parsedData: EventPayload<T> = JSON.parse(messageData)
