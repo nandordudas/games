@@ -7,6 +7,7 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxthub/core',
+    '@nuxt/ui',
   ],
   runtimeConfig: {
     public: {

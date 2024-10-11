@@ -15,14 +15,32 @@ defineOptions({
   inheritAttrs: false,
 })
 
-// [INFO] Generic types have swapped places
-const { on, post } = useWebWorker<ReceiveEvents, SendEvents>(new Worker({ name: 'test' }))
+const toast = useToast()
 
+// [INFO] Generic types have swapped places
+const { on, post } = useWebWorker<ReceiveEvents, SendEvents>(new Worker({ name: 'Test' }))
+
+// [TODO] Use emitter instead of on and post
+// eslint-disable-next-line complexity
 on('message', (event) => {
   logger.info('Received message:', event)
 
   if (event.data.type === 'pong') {
     post({ type: 'init' })
+  }
+
+  if (event.data.type === 'error') {
+    toast.add({ title: 'Error occurred' })
+  }
+
+  if (event.data.type === 'connected') {
+    if (event.data.data === 'worker') {
+      toast.add({ title: 'Worker connected' })
+    }
+
+    if (event.data.data === 'webSocket') {
+      toast.add({ title: 'WebSocket connected' })
+    }
   }
 })
 
