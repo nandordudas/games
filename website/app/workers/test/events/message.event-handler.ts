@@ -42,7 +42,7 @@ export function onMessage() {
         setTimeout(() => {
           // [INFO] Test closing the `WebSocket` connection
           webSocket.close(3_001, 'Explicitly closing the WebSocket connection')
-        }, 15_000)
+        }, 3_600_000)
       })
       .catch((error) => {
         // [TODO] Notify main thread of connection error
