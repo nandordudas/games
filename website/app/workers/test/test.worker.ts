@@ -3,5 +3,9 @@ import { onMessage } from '~/workers/test/events/message.event-handler'
 
 const addEventListener = globalThis.addEventListener.bind(globalThis)
 
-addEventListener('error', onError())
-addEventListener('message', onMessage())
+main()
+
+function main(): void {
+  addEventListener('error', onError())
+  addEventListener('message', onMessage())
+}

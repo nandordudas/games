@@ -1,4 +1,4 @@
-export function onError(): (this: DedicatedWorkerGlobalScope, event: ErrorEvent) => any {
+export function onError() {
   return (event: ErrorEvent) => {
     // [TODO] Check `event.error` type
     console.error('Worker error:', event.error)

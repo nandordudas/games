@@ -1,6 +1,4 @@
-import type { EventMap, EventPayload } from '~~/types'
-
-type DisposeFunction = () => void
+import type { DisposeFunction, EventMap, EventPayload } from '~~/types'
 
 /**
  * @throws If used on the server side.
