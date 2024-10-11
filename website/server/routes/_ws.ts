@@ -18,6 +18,7 @@ export default defineWebSocketHandler({
   },
   open(peer) {
     logger.info('open', peer.id)
+    peer.send({ type: 'connected' })
   },
   error(peer, error) {
     logger.error('error', { peerId: peer.id, error })
@@ -30,8 +31,19 @@ export default defineWebSocketHandler({
 
     logger.info('message', { peerId: peer.id, payload })
 
-    if (payload === 'ping') {
-      peer.send('pong')
+    try {
+      const data = JSON.parse(payload)
+
+      if (data.type === 'ping') {
+        peer.send({ type: 'pong' })
+      }
+      else {
+        // echo message
+        peer.send(data)
+      }
+    }
+    catch (error) {
+      logger.error('failed to send message', { peerId: peer.id, error })
     }
   },
 })

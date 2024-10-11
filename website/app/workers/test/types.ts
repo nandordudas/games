@@ -3,6 +3,10 @@ export interface ReceiveEvents {
   init: void
 }
 
+type ConnectEvent = 'webSocket' | 'worker'
+
 export interface SendEvents {
   pong: void
+  connected: ConnectEvent
+  error: void
 }

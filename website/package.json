@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
+    "cleanup": "nuxt cleanup",
     "db:generate": "drizzle-kit generate --config .config/drizzle.ts",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
@@ -22,7 +23,7 @@
     "vue-tsc": "catalog:"
   },
   "devDependencies": {
-    "@nuxthub/core": "^0.7.26",
-    "wrangler": "^3.80.2"
+    "@nuxthub/core": "^0.7.27",
+    "wrangler": "^3.80.4"
   }
 }

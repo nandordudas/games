@@ -14,3 +14,5 @@ export type Union<U extends unknown[]> = U extends [infer F, ...infer R]
   : unknown
 
 export type Handler<T = any, R = void> = (...data: T[]) => R
+
+export type DisposeFunction = () => void
