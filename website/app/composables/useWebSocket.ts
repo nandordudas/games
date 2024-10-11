@@ -1,4 +1,10 @@
+/**
+ * @throws If used on the server side.
+ */
 export function useWebSocket() {
+  if (import.meta.server)
+    throw new Error('useWebWorker should only be used on the client side')
+
   /**
    * @throws If the path is not a valid URL.
    */
@@ -28,6 +34,7 @@ export function useWebSocket() {
 }
 
 /**
+ * [TODO] Extract this to a shared utility
  * @throws If the path is not a valid URL.
  */
 export function createWebSocketURL(path: string | URL): URL {
