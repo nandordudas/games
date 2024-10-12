@@ -1,12 +1,13 @@
 import type { EventPayload } from '~~/types'
-import { watch } from 'vue'
-import { useWebSocket } from '~/composables/useWebSocket'
-import { createEmitter } from '~/utils/createEmitter'
+// import { watch } from 'vue'
+// import { useWebSocket } from '~/composables/useWebSocket'
+// import { createEmitter } from '~/utils/createEmitter'
 import { createWebSocketURL } from '~/utils/createWebSocketUrl'
 import type { ReceiveEvents, SendEvents } from '~/workers/test/types'
 import { createPostMessage } from '~/workers/utils/createPostMessage'
+import { WebSocketManager } from '~/workers/utils/webSocketManager'
 
-const setTimeout = globalThis.setTimeout.bind(globalThis)
+// const setTimeout = globalThis.setTimeout.bind(globalThis)
 
 export function onMessage() {
   const emitter = createEmitter<ReceiveEvents>()
@@ -18,36 +19,59 @@ export function onMessage() {
   })
 
   emitter.on('init', async () => {
-    const webSocket = useWebSocket<{
-      // [TODO] Share event types between websocket and main worker
-      echo: string
-    }>({
-      onConnected: () => post({ type: 'connected', data: 'webSocket' }),
-      onError: () => post({ type: 'error' }),
-    })
+    // const webSocket = useWebSocket<{
+    //   // [TODO] Share event types between websocket and main worker
+    //   echo: string
+    // }>({
+    //   onConnected: () => post({ type: 'connected', data: 'webSocket' }),
+    //   onError: () => post({ type: 'error' }),
+    // })
 
-    watch([webSocket.status, webSocket.isConnected, webSocket.lastHeartbeat], ([...args]) => {
+    // watch([webSocket.status, webSocket.isConnected, webSocket.lastHeartbeat], ([...args]) => {
+    //   // eslint-disable-next-line no-console
+    //   console.info('WebSocket connection status:', args)
+    // })
+
+    // await webSocket.connect(createWebSocketURL('/_ws'))
+    //   .then(() => {
+    //     webSocket.ping()
+    //     watch(webSocket.data, (value) => {
+    //       // eslint-disable-next-line no-console
+    //       console.log('WebSocket data:', value)
+    //     })
+    //     webSocket.send({ type: 'echo', data: 'Hello, WebSocket!' })
+    //     setTimeout(() => {
+    //       // [INFO] Test closing the `WebSocket` connection
+    //       webSocket.close(3_001, 'Explicitly closing the WebSocket connection')
+    //     }, 3_600_000)
+    //   })
+    //   .catch((error) => {
+    //     // [TODO] Notify main thread of connection error
+    //     console.error('Failed to connect to WebSocket server:', error)
+    //   })
+
+    try {
+      const wsm = await WebSocketManager.connect<{
+        message: { content: string }
+        userJoined: { userId: string }
+        ping: void
+      }>(createWebSocketURL('/_ws'))
+
+      wsm.send('string')
+      wsm.send({ type: 'message', data: { content: 'Hello message' } })
+      wsm.send(new TextEncoder().encode('Hello, WebSocket!'))
+
       // eslint-disable-next-line no-console
-      console.info('WebSocket connection status:', args)
-    })
+      console.log('WebSocketManager connected:', wsm)
 
-    await webSocket.connect(createWebSocketURL('/_ws'))
-      .then(() => {
-        webSocket.ping()
-        watch(webSocket.data, (value) => {
-          // eslint-disable-next-line no-console
-          console.log('WebSocket data:', value)
-        })
-        webSocket.send({ type: 'echo', data: 'Hello, WebSocket!' })
-        setTimeout(() => {
-          // [INFO] Test closing the `WebSocket` connection
-          webSocket.close(3_001, 'Explicitly closing the WebSocket connection')
-        }, 3_600_000)
-      })
-      .catch((error) => {
-        // [TODO] Notify main thread of connection error
-        console.error('Failed to connect to WebSocket server:', error)
-      })
+      setTimeout(() => {
+        wsm.close(3_001, 'Explicitly closing the WebSocket connection')
+      }, 3_000)
+    }
+    catch (error) {
+      // [TODO] Notify main thread of connection error
+      console.error('Failed to connect to WebSocket server:', error)
+    }
   })
 
   return (event: MessageEvent<EventPayload<ReceiveEvents>>) => {
