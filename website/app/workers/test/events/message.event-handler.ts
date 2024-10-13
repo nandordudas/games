@@ -1,13 +1,11 @@
+/// <reference lib="WebWorker"/>
+
 import type { EventPayload } from '~~/types'
-// import { watch } from 'vue'
-// import { useWebSocket } from '~/composables/useWebSocket'
-// import { createEmitter } from '~/utils/createEmitter'
+import { consola } from 'consola'
 import { createWebSocketURL } from '~/utils/createWebSocketUrl'
 import type { ReceiveEvents, SendEvents } from '~/workers/test/types'
 import { createPostMessage } from '~/workers/utils/createPostMessage'
-import { WebSocketManager } from '~/workers/utils/webSocketManager'
-
-// const setTimeout = globalThis.setTimeout.bind(globalThis)
+import { WebSocketManager } from '~/workers/utils/web-socket-manager'
 
 export function onMessage() {
   const emitter = createEmitter<ReceiveEvents>()
@@ -19,54 +17,32 @@ export function onMessage() {
   })
 
   emitter.on('init', async () => {
-    // const webSocket = useWebSocket<{
-    //   // [TODO] Share event types between websocket and main worker
-    //   echo: string
-    // }>({
-    //   onConnected: () => post({ type: 'connected', data: 'webSocket' }),
-    //   onError: () => post({ type: 'error' }),
-    // })
+    interface S {
+      message: { content: string }
+      ping: void
+    }
 
-    // watch([webSocket.status, webSocket.isConnected, webSocket.lastHeartbeat], ([...args]) => {
-    //   // eslint-disable-next-line no-console
-    //   console.info('WebSocket connection status:', args)
-    // })
-
-    // await webSocket.connect(createWebSocketURL('/_ws'))
-    //   .then(() => {
-    //     webSocket.ping()
-    //     watch(webSocket.data, (value) => {
-    //       // eslint-disable-next-line no-console
-    //       console.log('WebSocket data:', value)
-    //     })
-    //     webSocket.send({ type: 'echo', data: 'Hello, WebSocket!' })
-    //     setTimeout(() => {
-    //       // [INFO] Test closing the `WebSocket` connection
-    //       webSocket.close(3_001, 'Explicitly closing the WebSocket connection')
-    //     }, 3_600_000)
-    //   })
-    //   .catch((error) => {
-    //     // [TODO] Notify main thread of connection error
-    //     console.error('Failed to connect to WebSocket server:', error)
-    //   })
+    interface R {
+      connected: string
+    }
 
     try {
-      const wsm = await WebSocketManager.connect<{
-        message: { content: string }
-        userJoined: { userId: string }
-        ping: void
-      }>(createWebSocketURL('/_ws'))
+      const wsm = await WebSocketManager.connect<R, S>({
+        url: createWebSocketURL('/_ws'),
+        logger: consola.withTag('ws'),
+      })
 
       wsm.send('string')
       wsm.send({ type: 'message', data: { content: 'Hello message' } })
       wsm.send(new TextEncoder().encode('Hello, WebSocket!'))
 
+      wsm.on('connected', (data) => {
+        // eslint-disable-next-line no-console
+        console.log('Received message', data)
+      })
+
       // eslint-disable-next-line no-console
       console.log('WebSocketManager connected:', wsm)
-
-      setTimeout(() => {
-        wsm.close(3_001, 'Explicitly closing the WebSocket connection')
-      }, 3_000)
     }
     catch (error) {
       // [TODO] Notify main thread of connection error

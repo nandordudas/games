@@ -13,6 +13,8 @@ export type Union<U extends unknown[]> = U extends [infer F, ...infer R]
   ? F & Union<R>
   : unknown
 
-export type Handler<T = any, R = void> = (...data: T[]) => R
-
+// [TODO] Use this to make type below work
+export type Fn<T = any, TReturn = void> = (...args: T extends any[] ? T : [T]) => TReturn
+export type Handler<T = any, TReturn = void> = (...data: T[]) => TReturn
 export type DisposeFunction = () => void
+export type PromiseResolver<T> = ReturnType<typeof Promise.withResolvers<T>>['resolve']

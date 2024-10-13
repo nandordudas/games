@@ -3,6 +3,7 @@
   "where-am-i.icon": "game",
   "where-am-i.textTransfrom": "capitalize",
   /* vscode.typescript-language-features */
+  "typescript.format.semicolons": "remove",
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "typescript.preferences.importModuleSpecifierEnding": "minimal",
   "typescript.preferences.quoteStyle": "single",

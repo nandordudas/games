@@ -7,6 +7,7 @@ export default antfu({
 })
   .override('antfu/typescript/rules', {
     rules: {
-      complexity: ['error', 5],
+      'complexity': ['error', 5],
+      'no-restricted-syntax': 'off',
     },
   })

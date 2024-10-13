@@ -14,23 +14,28 @@ const statusCodes = {
   1001: 'Going Away',
 } as const
 
-const encoder = new TextEncoder()
-const encode = encoder.encode.bind(encoder)
+// const encoder = new TextEncoder()
+// const encode = encoder.encode.bind(encoder)
 
 /**
- * @see https://www.rfc-editor.org/rfc/rfc6455.html#section-5.2
+ * @see {@link https://www.rfc-editor.org/rfc/rfc6455.html#section-5.2|Base Framing Protocol}
  */
-const OPCODE_TEXT = 0x01
-const OPCODE_BINARY = 0x02
-const OPCODE_PING = 0x09
-const OPCODE_CONNECTION_CLOSE = 0x08
+const enum WebSocketMessageType {
+  OPCODE_TEXT = 0x01,
+  OPCODE_BINARY = 0x02,
+  OPCODE_CONNECTION_CLOSE = 0x08,
+  OPCODE_PING = 0x09,
+  OPCODE_PONG = 0x0A,
+}
 
+const PING_FRAME = new Uint8Array([0x89, 0x00])
 const PONG_FRAME = new Uint8Array([0x8A, 0x00])
 
 const opcodeMap = {
-  [OPCODE_PING]: pong,
-  [OPCODE_CONNECTION_CLOSE]: (peer: Peer) => peer.close(),
-  [OPCODE_TEXT]: (_peer: Peer, data: Uint8Array) => {
+  [WebSocketMessageType.OPCODE_PING]: pong,
+  [WebSocketMessageType.OPCODE_PONG]: (_peer: Peer) => logger.debug('🏓'),
+  [WebSocketMessageType.OPCODE_CONNECTION_CLOSE]: (peer: Peer) => peer.close(),
+  [WebSocketMessageType.OPCODE_TEXT]: (_peer: Peer, data: Uint8Array) => {
     const message = Buffer.from(data).toString()
 
     if (!message.startsWith('{'))
@@ -43,7 +48,7 @@ const opcodeMap = {
       logger.error('failed to parse message:', error)
     }
   },
-  [OPCODE_BINARY]: (_peer: Peer, data: Uint8Array) => {
+  [WebSocketMessageType.OPCODE_BINARY]: (_peer: Peer, data: Uint8Array) => {
     return logger.log('binary:', Buffer.from(data).toString())
   },
   unknown: (_peer: Peer, data: Uint8Array) => {
@@ -59,7 +64,8 @@ export default defineWebSocketHandler({
   },
   open(peer) {
     logger.info('open', peer.id)
-    send<{ connected: void }>(peer, { type: 'connected' })
+    peer.send(PING_FRAME)
+    _send<{ connected: string }>(peer, { type: 'connected', data: 'Bonjour' })
   },
   error(peer, error) {
     logger.error('error', { peerId: peer.id, error })
@@ -83,7 +89,7 @@ export default defineWebSocketHandler({
   },
 })
 
-function send<SendEvents extends EventMap>(
+function _send<SendEvents extends EventMap>(
   peer: Peer,
   message: EventPayload<SendEvents>,
   options?: { compress?: boolean },
@@ -93,10 +99,22 @@ function send<SendEvents extends EventMap>(
     return
   }
 
-  peer.send(encode(JSON.stringify(message)), options)
+  peer.send(prependOpcode(createJsonFrame(message), WebSocketMessageType.OPCODE_TEXT), options)
+}
+
+function prependOpcode(data: Uint8Array, opcode: number): Uint8Array {
+  const frame = new Uint8Array(data.length + 1)
+  frame[0] = opcode
+  frame.set(data, 1)
+  return frame
+}
+
+function createJsonFrame(value: object): Uint8Array {
+  const jsonString = JSON.stringify(value)
+  return new TextEncoder().encode(jsonString)
 }
 
 function pong(peer: Peer): void {
-  logger.debug('✋')
+  logger.debug('🏓')
   peer.send(PONG_FRAME)
 }
